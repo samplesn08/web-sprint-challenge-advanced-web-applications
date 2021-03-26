@@ -21,9 +21,14 @@ const ColorList = ({ colors, updateColors }) => {
     e.preventDefault();
     axiosWithAuth().put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit)
       .then(resp => {
-        console.log(resp.data)
-        //updateColors(resp.data)
-        // only getting back the edited color?? why aren't I getting back the whole array??  I need the whole colors array, with the updated value, so that I can do updateColors(resp.data)
+        const newColors = colors.map(color => {
+          if (color.id !== resp.data.id) {
+            return color
+          } else {
+            return resp.data;
+          }
+        })
+        updateColors(newColors)
       })
       .catch(err => {
         console.log(err);
