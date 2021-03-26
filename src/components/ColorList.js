@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useParams } from 'react-router-dom';
 import axiosWithAuth from "../helpers/axiosWithAuth";
 import EditMenu from './EditMenu';
 
@@ -8,31 +7,37 @@ const initialColor = {
   code: { hex: "" }
 };
 
+
+
 const ColorList = ({ colors, updateColors }) => {
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
-  const { id } = useParams();
   const editColor = color => {
     setEditing(true);
     setColorToEdit(color);
   };
-  
+
   const saveEdit = e => {
     e.preventDefault();
-    axiosWithAuth().put(`http://localhost:5000/api/${id}`, colorToEdit)
+    axiosWithAuth().put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit)
       .then(resp => {
-        console.log(resp)
+        console.log(resp.data)
+        //updateColors(resp.data)
+        // only getting back the edited color?? why aren't I getting back the whole array??  I need the whole colors array, with the updated value, so that I can do updateColors(resp.data)
       })
       .catch(err => {
-        console.log(err.response);
+        console.log(err);
       })
   };
+
+  const deleteHandler = (id) => {
+    updateColors(colors.filter(item=>(item.id !== Number(id))))
+  }
 
   const deleteColor = color => {
     axiosWithAuth().delete(`http://localhost:5000/api/colors/${color.id}`)
       .then(resp => {
-        updateColors(colors.filter(item=>(item.id !== resp)))
-        console.log(colors)
+        deleteHandler(color.id)
       })
       .catch(err=> {
         console.log(err.response)
